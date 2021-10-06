@@ -2,28 +2,22 @@
 
 pragma solidity >=0.6.6 <0.9.0;
 
-contract Donation {
-    address public owner;
+import "@openzeppelin/contracts/access/Ownable.sol";
+contract Donation is Ownable {
     mapping(address => uint) public donationByAddress;
-    uint256 total = 0;
-    event donated(uint value);
+    uint256 public totalDonated;
     
-    constructor() public {
-        owner = msg.sender;
+    constructor() {
+        totalDonated = 0;
     }
 
     function fund() public payable {
         donationByAddress[msg.sender] += msg.value;
-        total += msg.value;
-    }
-    
-    function getBalance() public view returns (uint) {
-        return address(this).balance;
+        totalDonated += msg.value;
     }
 
-    modifier onlyOwner {
-        require (msg.sender == owner);
-        _;
+    function getBalance() public view returns (uint) {
+        return address(this).balance;
     }
 
     function withdraw() payable onlyOwner public {
