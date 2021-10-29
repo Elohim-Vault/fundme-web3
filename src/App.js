@@ -10,7 +10,7 @@ import Spinner from 'react-bootstrap/Spinner';
 
 
 function App() {
-  var web3 = new Web3(Web3.givenProvider);
+  const [web3, setWeb3] = useState(null);
   const [account, setAccount] = useState('');
   const [contract, setContract] = useState(null);
   const [amount, setAmount] = useState(0);
@@ -18,10 +18,13 @@ function App() {
   const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
+
     loadBlockchainData();
   }, [])
 
   async function loadBlockchainData() {
+    const web3 = new Web3(Web3.givenProvider);
+    setWeb3(web3);
     const accounts = await web3.eth.getAccounts();
     const contractDonation = new web3.eth.Contract(DONATION_ABI, DONATION_ADDRESS);
     setAccount(accounts[0]);
@@ -29,6 +32,7 @@ function App() {
     let balance = await contractDonation.methods.getBalance().call();
     balance = web3.utils.fromWei(balance, 'ether');
     setBalance(balance);
+    console.log(web3.eth.accounts.wallet);
   }
 
   async function makeTransaction() {
@@ -38,6 +42,10 @@ function App() {
       let balance = await contract.methods.getBalance().call();
       balance = web3.utils.fromWei(balance, 'ether');
       setBalance(balance);
+      setIsPending(false);
+    })
+    .catch(err => {
+      alert(err.message);
       setIsPending(false);
     });
 
